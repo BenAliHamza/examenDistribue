@@ -2,14 +2,10 @@ server:
   port: 8082
 
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/filmsdb
-    username: root
-    password:
-  jpa:
-    hibernate:
-      ddl-auto: update
-    show-sql: true
+  data:
+    mongodb:
+      uri: mongodb://film-db:27017/filmsdb
+
 springdoc:
   api-docs:
     path: /api-docs

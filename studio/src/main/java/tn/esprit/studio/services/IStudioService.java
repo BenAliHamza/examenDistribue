@@ -1,15 +1,17 @@
 package tn.esprit.studio.services;
 
+import tn.esprit.studio.dto.StudioRequest;
+import tn.esprit.studio.dto.StudioResponse;
 import tn.esprit.studio.entities.Studio;
 
 import java.util.List;
 
 public interface IStudioService {
 
-        Studio create(Studio studio);
-        Studio update(Long id, Studio studio);
+        StudioResponse create(StudioRequest request);
+        StudioResponse update(Long id, StudioRequest request);
         void delete(Long id);
-        Studio getById(Long id);
-        List<Studio> getAll();
+        StudioResponse getById(Long id);
+        List<StudioResponse> getAll();
 
 }

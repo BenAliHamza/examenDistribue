@@ -1,12 +1,13 @@
+// tn/esprit/films/service/mappers/FilmMapper.java
 package tn.esprit.films.service.mappers;
 
-
 import tn.esprit.films.entities.Film;
-import tn.esprit.films.service.dto.FilmDTO;
+import tn.esprit.films.service.dto.FilmRequest;
+import tn.esprit.films.service.dto.FilmResponse;
 
 public class FilmMapper {
-    public static FilmDTO toDTO(Film film) {
-        return FilmDTO.builder()
+    public static FilmResponse toResponse(Film film) {
+        return FilmResponse.builder()
                 .id(film.getId())
                 .title(film.getTitle())
                 .director(film.getDirector())
@@ -17,14 +18,14 @@ public class FilmMapper {
                 .build();
     }
 
-    public static Film toEntity(FilmDTO filmDTO) {
+    public static Film toEntity(FilmRequest request) {
         return Film.builder()
-                .title(filmDTO.getTitle())
-                .director(filmDTO.getDirector())
-                .releaseDate(filmDTO.getReleaseDate())
-                .studioId(filmDTO.getStudioId())
-                .genre(filmDTO.getGenre())
-                .duration(filmDTO.getDuration())
+                .title(request.getTitle())
+                .director(request.getDirector())
+                .releaseDate(request.getReleaseDate())
+                .studioId(request.getStudioId())
+                .genre(request.getGenre())
+                .duration(request.getDuration())
                 .build();
     }
 }

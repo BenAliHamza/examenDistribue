@@ -1,15 +1,14 @@
 package tn.esprit.films.service;
 
-import tn.esprit.films.service.dto.FilmDTO;
+import tn.esprit.films.service.dto.FilmRequest;
+import tn.esprit.films.service.dto.FilmResponse;
 
 import java.util.List;
 
 public interface FilmService {
-    public FilmDTO createFilm(FilmDTO filmDTO);
-
-
-    public List<FilmDTO> getAllFilms();
-    public FilmDTO getFilmById(String id);
-    public FilmDTO updateFilm(String id, FilmDTO filmDTO);
-    public void deleteFilm(String id) ;
+    FilmResponse createFilm(FilmRequest request);
+    List<FilmResponse> getAllFilms();
+    FilmResponse getFilmById(String id);
+    FilmResponse updateFilm(String id, FilmRequest request);
+    void deleteFilm(String id);
 }

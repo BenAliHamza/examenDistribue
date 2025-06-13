@@ -1,0 +1,63 @@
+version: '3.8'
+
+services:
+  studio-db:
+    image: mysql:8.0
+    container_name: studio-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: studiodb
+    ports:
+      - "3307:3306"  # Changed to avoid port conflict
+    volumes:
+      - studio-db-data:/var/lib/mysql
+    networks:
+      - micro-network
+
+  studio-service:
+    build: ./studio
+    container_name: studio-service
+    volumes:
+      - ./studio:/app
+      - studio-m2-cache:/root/.m2
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://studio-db:3306/studiodb
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: root
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    networks:
+      - micro-network
+
+  film-db:
+    image: mongo:5.0
+    container_name: film-db
+    ports:
+      - "27017:27017"
+    volumes:
+      - film-db-data:/data/db
+    networks:
+      - micro-network
+
+  film-service:
+    build: ./films
+    container_name: film-service
+    volumes:
+      - ./films:/app
+      - film-m2-cache:/root/.m2
+    ports:
+      - "8082:8082"  # Changed to avoid clash with studio-service
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://film-db:27017/filmsdb
+    networks:
+      - micro-network
+
+volumes:
+  studio-db-data:
+  film-db-data:
+  studio-m2-cache:
+  film-m2-cache:
+
+networks:
+  micro-network:

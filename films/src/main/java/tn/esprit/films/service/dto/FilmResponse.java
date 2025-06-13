@@ -1,7 +1,5 @@
 package tn.esprit.films.service.dto;
 
-
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -11,21 +9,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FilmDTO {
+public class FilmResponse {
     private String id;
-
-    @NotBlank(message = "Title is required")
     private String title;
-
-    @NotBlank(message = "Director is required")
     private String director;
-
     private LocalDate releaseDate;
-
-    @NotBlank(message = "Studio ID is required")
     private String studioId;
-
     private String genre;
-
     private Integer duration;
 }

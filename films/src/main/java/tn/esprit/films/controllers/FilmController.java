@@ -1,12 +1,12 @@
 package tn.esprit.films.controllers;
 
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import tn.esprit.films.service.FilmService;
-import tn.esprit.films.service.dto.FilmDTO;
+import tn.esprit.films.service.dto.FilmRequest;
+import tn.esprit.films.service.dto.FilmResponse;
 
 import java.util.List;
 
@@ -18,23 +18,26 @@ public class FilmController {
     private final FilmService filmService;
 
     @PostMapping
-    public ResponseEntity<FilmDTO> createFilm(@RequestBody FilmDTO filmDTO) {
-        return new ResponseEntity<>(filmService.createFilm(filmDTO), HttpStatus.CREATED);
+    public ResponseEntity<FilmResponse> createFilm(@RequestBody FilmRequest request) {
+        return new ResponseEntity<>(filmService.createFilm(request), HttpStatus.CREATED);
     }
 
     @GetMapping
-    public ResponseEntity<List<FilmDTO>> getAllFilms() {
+    public ResponseEntity<List<FilmResponse>> getAllFilms() {
         return ResponseEntity.ok(filmService.getAllFilms());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<FilmDTO> getFilmById(@PathVariable String id) {
+    public ResponseEntity<FilmResponse> getFilmById(@PathVariable String id) {
         return ResponseEntity.ok(filmService.getFilmById(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<FilmDTO> updateFilm(@PathVariable String id, @RequestBody FilmDTO filmDTO) {
-        return ResponseEntity.ok(filmService.updateFilm(id, filmDTO));
+    public ResponseEntity<FilmResponse> updateFilm(
+            @PathVariable String id,
+            @RequestBody FilmRequest request
+    ) {
+        return ResponseEntity.ok(filmService.updateFilm(id, request));
     }
 
     @DeleteMapping("/{id}")

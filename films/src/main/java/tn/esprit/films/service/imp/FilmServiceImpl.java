@@ -1,3 +1,4 @@
+// tn/esprit/films/service/imp/FilmServiceImpl.java
 package tn.esprit.films.service.imp;
 
 import lombok.RequiredArgsConstructor;
@@ -5,7 +6,8 @@ import org.springframework.stereotype.Service;
 import tn.esprit.films.entities.Film;
 import tn.esprit.films.repositories.FilmRepository;
 import tn.esprit.films.service.FilmService;
-import tn.esprit.films.service.dto.FilmDTO;
+import tn.esprit.films.service.dto.FilmRequest;
+import tn.esprit.films.service.dto.FilmResponse;
 import tn.esprit.films.service.mappers.FilmMapper;
 
 import java.util.List;
@@ -16,33 +18,43 @@ import java.util.stream.Collectors;
 public class FilmServiceImpl implements FilmService {
     private final FilmRepository filmRepository;
 
-    public FilmDTO createFilm(FilmDTO filmDTO) {
-        Film film = FilmMapper.toEntity(filmDTO);
-        return FilmMapper.toDTO(filmRepository.save(film));
+    @Override
+    public FilmResponse createFilm(FilmRequest request) {
+        Film film = FilmMapper.toEntity(request);
+        return FilmMapper.toResponse(filmRepository.save(film));
     }
 
-    public List<FilmDTO> getAllFilms() {
+    @Override
+    public List<FilmResponse> getAllFilms() {
         return filmRepository.findAll()
                 .stream()
-                .map(FilmMapper::toDTO)
+                .map(FilmMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    public FilmDTO getFilmById(String id) {
+    @Override
+    public FilmResponse getFilmById(String id) {
         return filmRepository.findById(id)
-                .map(FilmMapper::toDTO)
+                .map(FilmMapper::toResponse)
                 .orElseThrow(() -> new RuntimeException("Film not found"));
     }
 
-    public FilmDTO updateFilm(String id, FilmDTO filmDTO) {
+    @Override
+    public FilmResponse updateFilm(String id, FilmRequest request) {
         Film existingFilm = filmRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Film not found"));
 
-        Film updatedFilm = FilmMapper.toEntity(filmDTO);
-        updatedFilm.setId(existingFilm.getId());
-        return FilmMapper.toDTO(filmRepository.save(updatedFilm));
+        existingFilm.setTitle(request.getTitle());
+        existingFilm.setDirector(request.getDirector());
+        existingFilm.setReleaseDate(request.getReleaseDate());
+        existingFilm.setStudioId(request.getStudioId());
+        existingFilm.setGenre(request.getGenre());
+        existingFilm.setDuration(request.getDuration());
+
+        return FilmMapper.toResponse(filmRepository.save(existingFilm));
     }
 
+    @Override
     public void deleteFilm(String id) {
         filmRepository.deleteById(id);
     }

@@ -10,6 +10,17 @@ services:
       - maven-repo:/root/.m2
     command: mvn clean install -DskipTests
 
+  config-server:
+    build:
+      context: ./config-server
+    container_name: config-server
+    ports:
+      - "8888:8888"
+    environment:
+      - GIT_REPO=https://github.com/BenAliHamza/repo-config
+    networks:
+      - micro-network
+
   studio-db:
     image: mysql:8.0
     container_name: studio-db
@@ -35,19 +46,20 @@ services:
     depends_on:
       shared-logging-builder:
         condition: service_completed_successfully
+      config-server:
+        condition: service_started
       studio-db:
         condition: service_healthy
     volumes:
+      - ./logs/studio:/logs
+      - ./config-repo:/config-repo
       - maven-repo:/root/.m2
-      - ./logs/studio:/logs               # logs accessibles localement
     ports:
       - "8081:8081"
     environment:
       LOG_DIR: /logs
-      SPRING_DATASOURCE_URL: jdbc:mysql://studio-db:3306/studiodb
-      SPRING_DATASOURCE_USERNAME: root
-      SPRING_DATASOURCE_PASSWORD: root
-      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_PROFILES_ACTIVE: default
     networks:
       - micro-network
 
@@ -70,14 +82,18 @@ services:
         condition: service_completed_successfully
       film-db:
         condition: service_started
+      config-server:
+        condition: service_started
     volumes:
+      - ./logs/films:/logs
+      - ./config-repo:/config-repo
       - maven-repo:/root/.m2
-      - ./logs/films:/logs               # logs accessibles localement
     ports:
       - "8082:8082"
     environment:
       LOG_DIR: /logs
-      SPRING_DATA_MONGODB_URI: mongodb://film-db:27017/filmsdb
+      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
+      SPRING_PROFILES_ACTIVE: default
     networks:
       - micro-network
 

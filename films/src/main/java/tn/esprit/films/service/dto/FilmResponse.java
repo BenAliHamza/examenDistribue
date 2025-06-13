@@ -3,6 +3,7 @@ package tn.esprit.films.service.dto;
 import lombok.*;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -17,4 +18,6 @@ public class FilmResponse {
     private String studioId;
     private String genre;
     private Integer duration;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 }

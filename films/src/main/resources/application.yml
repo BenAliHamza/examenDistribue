@@ -6,6 +6,10 @@ spring:
     mongodb:
       uri: mongodb://film-db:27017/filmsdb
 
+logging:
+  level:
+    root: info
+
 springdoc:
   api-docs:
     path: /api-docs

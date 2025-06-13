@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+
+  shared-logging-builder:
+    build:
+      context: ./shared-logging
+    container_name: shared-logging-builder
+    volumes:
+      - maven-repo:/root/.m2
+    command: mvn clean install -DskipTests
+
   studio-db:
     image: mysql:8.0
     container_name: studio-db
@@ -8,21 +17,33 @@ services:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: studiodb
     ports:
-      - "3307:3306"  # Changed to avoid port conflict
+      - "3307:3306"
     volumes:
       - studio-db-data:/var/lib/mysql
     networks:
       - micro-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   studio-service:
-    build: ./studio
+    build:
+      context: ./studio
     container_name: studio-service
+    depends_on:
+      shared-logging-builder:
+        condition: service_completed_successfully
+      studio-db:
+        condition: service_healthy
     volumes:
-      - ./studio:/app
-      - studio-m2-cache:/root/.m2
+      - maven-repo:/root/.m2
+      - ./logs/studio:/logs               # logs accessibles localement
     ports:
       - "8081:8081"
     environment:
+      LOG_DIR: /logs
       SPRING_DATASOURCE_URL: jdbc:mysql://studio-db:3306/studiodb
       SPRING_DATASOURCE_USERNAME: root
       SPRING_DATASOURCE_PASSWORD: root
@@ -41,14 +62,21 @@ services:
       - micro-network
 
   film-service:
-    build: ./films
+    build:
+      context: ./films
     container_name: film-service
+    depends_on:
+      shared-logging-builder:
+        condition: service_completed_successfully
+      film-db:
+        condition: service_started
     volumes:
-      - ./films:/app
-      - film-m2-cache:/root/.m2
+      - maven-repo:/root/.m2
+      - ./logs/films:/logs               # logs accessibles localement
     ports:
-      - "8082:8082"  # Changed to avoid clash with studio-service
+      - "8082:8082"
     environment:
+      LOG_DIR: /logs
       SPRING_DATA_MONGODB_URI: mongodb://film-db:27017/filmsdb
     networks:
       - micro-network
@@ -56,8 +84,7 @@ services:
 volumes:
   studio-db-data:
   film-db-data:
-  studio-m2-cache:
-  film-m2-cache:
+  maven-repo:
 
 networks:
   micro-network:

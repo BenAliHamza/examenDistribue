@@ -6,6 +6,7 @@
       <list>
         <option value="$PROJECT_DIR$/films/pom.xml" />
         <option value="$PROJECT_DIR$/studio/pom.xml" />
+        <option value="$PROJECT_DIR$/shared-logging/pom.xml" />
       </list>
     </option>
   </component>

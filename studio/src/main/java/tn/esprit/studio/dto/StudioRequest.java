@@ -3,6 +3,9 @@ package tn.esprit.studio.dto;
 
 import lombok.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -12,4 +15,7 @@ public class StudioRequest {
     private String name;
     private String location;
     private String description;
+
+    @Builder.Default
+    private List<Long> filmIds = new ArrayList<>(); // Accept film IDs from client
 }

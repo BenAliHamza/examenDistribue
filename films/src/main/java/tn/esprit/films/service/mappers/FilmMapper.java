@@ -1,4 +1,3 @@
-// tn/esprit/films/service/mappers/FilmMapper.java
 package tn.esprit.films.service.mappers;
 
 import tn.esprit.films.entities.Film;
@@ -15,6 +14,8 @@ public class FilmMapper {
                 .studioId(film.getStudioId())
                 .genre(film.getGenre())
                 .duration(film.getDuration())
+                .createdAt(film.getCreatedAt())
+                .updatedAt(film.getUpdatedAt())
                 .build();
     }
 

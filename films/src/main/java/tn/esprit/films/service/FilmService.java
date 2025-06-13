@@ -11,4 +11,6 @@ public interface FilmService {
     FilmResponse getFilmById(String id);
     FilmResponse updateFilm(String id, FilmRequest request);
     void deleteFilm(String id);
+    // In FilmService
+    List<FilmResponse> getFilmsByStudioId(String studioId);
 }

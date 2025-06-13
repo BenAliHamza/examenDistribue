@@ -4,7 +4,6 @@ import tn.esprit.studio.dto.StudioRequest;
 import tn.esprit.studio.dto.StudioResponse;
 import tn.esprit.studio.entities.Studio;
 
-
 public class StudioMapper {
 
     public static Studio toEntity(StudioRequest request) {
@@ -12,6 +11,7 @@ public class StudioMapper {
                 .name(request.getName())
                 .location(request.getLocation())
                 .description(request.getDescription())
+                .filmIds(request.getFilmIds()) // Map film IDs
                 .build();
     }
 
@@ -21,6 +21,9 @@ public class StudioMapper {
                 .name(studio.getName())
                 .location(studio.getLocation())
                 .description(studio.getDescription())
+                .filmIds(studio.getFilmIds()) // Map film IDs
+                .createdAt(studio.getCreatedAt())
+                .updatedAt(studio.getUpdatedAt())
                 .build();
     }
 }

@@ -61,6 +61,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>tn.esprit</groupId>
+            <artifactId>shared-logging</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+
+
     </dependencies>
 
     <build>

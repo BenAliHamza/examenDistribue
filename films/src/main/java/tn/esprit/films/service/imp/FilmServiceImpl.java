@@ -97,4 +97,10 @@ public class FilmServiceImpl implements FilmService {
         logger.debug("SERVICE", "Found {} films for studio {}", films.size(), studioId);
         return films;
     }
+
+    @Override
+    public Film getEntityById(String id) {
+        return filmRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Film not found"));
+    }
 }

@@ -2,7 +2,6 @@ package tn.esprit.studio.services;
 
 import tn.esprit.studio.dto.StudioRequest;
 import tn.esprit.studio.dto.StudioResponse;
-import tn.esprit.studio.entities.Studio;
 
 import java.util.List;
 

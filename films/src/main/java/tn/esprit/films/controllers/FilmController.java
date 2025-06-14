@@ -4,9 +4,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import tn.esprit.films.entities.Film;
 import tn.esprit.films.service.FilmService;
 import tn.esprit.films.service.dto.FilmRequest;
 import tn.esprit.films.service.dto.FilmResponse;
+import tn.esprit.films.service.dto.FilmWithStudioDto;
+import tn.esprit.films.service.dto.StudioResponse;
+import tn.esprit.films.service.imp.StudioIntegrationService;
+import tn.esprit.films.service.mappers.FilmWithStudioMapper;
 import tn.esprit.sharedlogging.utils.LoggerFactoryUtil;
 import tn.esprit.sharedlogging.interfaces.CustomLogger;
 
@@ -19,7 +24,7 @@ public class FilmController {
 
     private final FilmService filmService;
     private final CustomLogger logger = LoggerFactoryUtil.getLogger(FilmController.class);
-
+    private final StudioIntegrationService studioIntegrationService ;
     @PostMapping
     public ResponseEntity<FilmResponse> createFilm(@RequestBody FilmRequest request) {
         logger.info("CONTROLLER", "Creating new film: {}", request.getTitle());
@@ -71,4 +76,16 @@ public class FilmController {
         logger.debug("CONTROLLER", "Found {} films for studio {}", films.size(), studioId);
         return ResponseEntity.ok(films);
     }
+
+
+    @GetMapping("/with-studio/{filmId}")
+    public FilmWithStudioDto filmAndStudio(@PathVariable String filmId) {
+        Film film = filmService.getEntityById(filmId);   // méthode qu’on crée juste après
+        StudioResponse studio = studioIntegrationService.findStudio(
+                Long.parseLong(film.getStudioId())
+        );
+        return FilmWithStudioMapper.toDto(film, studio);
+    }
+
+
 }

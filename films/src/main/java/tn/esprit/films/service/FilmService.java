@@ -1,5 +1,6 @@
 package tn.esprit.films.service;
 
+import tn.esprit.films.entities.Film;
 import tn.esprit.films.service.dto.FilmRequest;
 import tn.esprit.films.service.dto.FilmResponse;
 
@@ -13,4 +14,7 @@ public interface FilmService {
     void deleteFilm(String id);
     // In FilmService
     List<FilmResponse> getFilmsByStudioId(String studioId);
+    // interface
+    Film getEntityById(String id);
+
 }

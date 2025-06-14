@@ -1,15 +1,22 @@
 version: '3.8'
 
 services:
-
+  #################################################################
+  # 1) Build du module de logging partagé (une seule fois)
+  #################################################################
   shared-logging-builder:
     build:
       context: ./shared-logging
     container_name: shared-logging-builder
+    command: mvn clean install -DskipTests
     volumes:
       - maven-repo:/root/.m2
-    command: mvn clean install -DskipTests
+    networks:
+      - micro-network
 
+  #################################################################
+  # 2) Config-Server (centralisation YAML via repo GitHub)
+  #################################################################
   config-server:
     build:
       context: ./config-server
@@ -17,10 +24,46 @@ services:
     ports:
       - "8888:8888"
     environment:
-      - GIT_REPO=https://github.com/BenAliHamza/repo-config
+      SPRING_APPLICATION_NAME: config-server
+      SPRING_CLOUD_CONFIG_SERVER_GIT_URI: https://github.com/BenAliHamza/repo-config
+    volumes:
+      - maven-repo:/root/.m2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8888/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - micro-network
 
+  #################################################################
+  # 3) Eureka Discovery-Server
+  #################################################################
+  discovery-server:
+    build:
+      context: ./discovery-server
+    container_name: discovery-server
+    depends_on:
+      config-server:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: discovery-server
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+    ports:
+      - "8761:8761"
+    volumes:
+      - maven-repo:/root/.m2
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - micro-network
+
+  #################################################################
+  # 4) Base de données MySQL pour le micro-service Studio
+  #################################################################
   studio-db:
     image: mysql:8.0
     container_name: studio-db
@@ -31,14 +74,17 @@ services:
       - "3307:3306"
     volumes:
       - studio-db-data:/var/lib/mysql
-    networks:
-      - micro-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - micro-network
 
+  #################################################################
+  # 5) Micro-service Studio  (JPA + MySQL)
+  #################################################################
   studio-service:
     build:
       context: ./studio
@@ -47,22 +93,26 @@ services:
       shared-logging-builder:
         condition: service_completed_successfully
       config-server:
-        condition: service_started
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
       studio-db:
         condition: service_healthy
-    volumes:
-      - ./logs/studio:/logs
-      - ./config-repo:/config-repo
-      - maven-repo:/root/.m2
+    environment:
+      SPRING_APPLICATION_NAME: studio
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      LOG_DIR: /logs
     ports:
       - "8081:8081"
-    environment:
-      LOG_DIR: /logs
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
-      SPRING_PROFILES_ACTIVE: default
+    volumes:
+      - ./logs/studio:/logs
+      - maven-repo:/root/.m2
     networks:
       - micro-network
 
+  #################################################################
+  # 6) Base Mongo pour le micro-service Films
+  #################################################################
   film-db:
     image: mongo:5.0
     container_name: film-db
@@ -73,6 +123,9 @@ services:
     networks:
       - micro-network
 
+  #################################################################
+  # 7) Micro-service Films (MongoDB)
+  #################################################################
   film-service:
     build:
       context: ./films
@@ -80,27 +133,34 @@ services:
     depends_on:
       shared-logging-builder:
         condition: service_completed_successfully
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
       film-db:
         condition: service_started
-      config-server:
-        condition: service_started
-    volumes:
-      - ./logs/films:/logs
-      - ./config-repo:/config-repo
-      - maven-repo:/root/.m2
+    environment:
+      SPRING_APPLICATION_NAME: films
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+      LOG_DIR: /logs
     ports:
       - "8082:8082"
-    environment:
-      LOG_DIR: /logs
-      SPRING_CONFIG_IMPORT: optional:configserver:http://config-server:8888
-      SPRING_PROFILES_ACTIVE: default
+    volumes:
+      - ./logs/films:/logs
+      - maven-repo:/root/.m2
     networks:
       - micro-network
 
+###################################################################
+# Volumes persistants
+###################################################################
 volumes:
   studio-db-data:
   film-db-data:
   maven-repo:
 
+###################################################################
+# Réseau commun
+###################################################################
 networks:
   micro-network:

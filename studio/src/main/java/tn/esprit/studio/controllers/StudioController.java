@@ -11,7 +11,7 @@ import tn.esprit.sharedlogging.interfaces.CustomLogger;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/studios")
+@RequestMapping("/studios")
 @RequiredArgsConstructor
 public class StudioController {
 

@@ -60,6 +60,23 @@ services:
       retries: 5
     networks:
       - micro-network
+  api-gateway:
+    build: ./api-gateway
+    container_name: api-gateway
+    depends_on:
+      config-server:
+        condition: service_healthy
+      discovery-server:
+        condition: service_healthy
+    environment:
+      SPRING_APPLICATION_NAME: api-gateway
+      SPRING_CONFIG_IMPORT: configserver:http://config-server:8888
+    ports:
+      - "8080:8080"
+    volumes:
+      - maven-repo:/root/.m2
+    networks:
+      - micro-network
 
   #################################################################
   # 4) Base de données MySQL pour le micro-service Studio

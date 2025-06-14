@@ -13,7 +13,7 @@ import tn.esprit.sharedlogging.interfaces.CustomLogger;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/films")
+@RequestMapping("/films")
 @RequiredArgsConstructor
 public class FilmController {
 
